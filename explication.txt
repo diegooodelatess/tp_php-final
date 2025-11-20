@@ -1,0 +1,49 @@
+Projet PHP : Connexion, Inscription, Messagerie
+
+
+
+sql.php — Connexion à la base de données
+Ce fichier crée une connexion PDO à la base MySQL.
+Il définit le DSN avec charset utf8mb4.
+Il utilise un try/catch pour capturer les erreurs.
+Il active les exceptions avec PDO::ERRMODE_EXCEPTION.
+
+
+formulaire.php — Page d’accueil
+Ce fichier affiche les formulaires de connexion et d’inscription.
+Il utilise session_start pour accéder aux variables de session.
+Il vérifie si des erreurs ou des messages de succès sont présents dans $_SESSION et les affiche.
+Les formulaires envoient les données via POST vers login.php et registre_erreurs.php.
+
+
+registre_erreurs.php — Traitement de l’inscription
+Ce fichier traite les données du formulaire d’inscription.
+Il vérifie que les champs username, password et name ne sont pas vides.
+Il vérifie si le nom d’utilisateur existe déjà dans la base avec une requête SELECT.
+Il vérifie que le mot de passe contient au moins 8 caractères.
+Il utilise password_hash pour sécuriser le mot de passe.
+Il insère l’utilisateur dans la base avec une requête INSERT.
+Il redirige vers formulaire.php avec un message d’erreur ou de succès.
+
+
+login.php — Traitement de la connexion
+Ce fichier vérifie les identifiants de connexion.
+Il vérifie que les champs username et password sont remplis.
+Il vérifie que l’utilisateur existe dans la base avec une requête SELECT.
+Il vérifie que le mot de passe est correct avec password_verify.
+Il démarre une session sécurisée avec session_regenerate_id.
+Il stocke le nom d’utilisateur dans $_SESSION['username'] et redirige vers message.php.
+
+
+logout.php — Déconnexion
+Ce fichier détruit la session avec session_destroy
+et redirige vers formulaire.php.
+
+
+message.php — Interface de messagerie
+Ce fichier affiche les messages et permet d’en envoyer un nouveau.
+Il vérifie que l’utilisateur est connecté avec $_SESSION['username'].
+Il vérifie que le message est non vide et ne dépasse pas 500 caractères.
+Il insère le message dans la base avec une requête INSERT.
+La colonne envoyé à est remplie automatiquement par MySQL.
+Il récupère les messages avec SELECT et les affiche avec le nom, le contenu et la date formatée.
