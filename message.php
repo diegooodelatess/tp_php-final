@@ -2,21 +2,23 @@
 session_start();
 require "sql.php";
 
-// Vérifie si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
     header("Location: formulaire.php");
     exit;
 }
 
-// Envoi du message
-if (isset($_POST['message']) && !empty(trim($_POST['message']))) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty(trim($_POST['message']))) {
     $message = trim($_POST['message']);
-    if (strlen($message) <= 500) {
+
+    if (strlen($message) > 500) {
+        $_SESSION['errors'] = ["Le message est trop long (maximum 500 caractères)."];
+    } else {
         $stmt = $dbh->prepare("INSERT INTO message (message, name) VALUES (?, ?)");
         $stmt->execute([$message, $_SESSION['username']]);
-    } else {
-        $_SESSION['errors'] = ["Le message est trop long (max 500 caractères)"];
     }
+
+    header("Location: message.php");
+    exit;
 }
 ?>
 
@@ -25,24 +27,38 @@ if (isset($_POST['message']) && !empty(trim($_POST['message']))) {
 <head>
     <meta charset="UTF-8">
     <title>Messages</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .message { margin-bottom: 20px; }
+        .author { font-weight: bold; }
+        .timestamp { color: gray; font-size: 0.9em; }
+        .error { color: red; }
+        textarea { width: 100%; max-width: 500px; height: 100px; }
+        button { margin-top: 10px; padding: 8px 16px; }
+    </style>
 </head>
 <body>
+
 <h1>Messages</h1>
 
 <?php
-// Affichage des messages
-$req = $dbh->query("SELECT * FROM message ORDER BY id DESC");
-foreach ($req as $msg) {
-    echo "<p><strong>" . htmlspecialchars($msg['name']) . "</strong><br>";
-    echo nl2br(htmlspecialchars($msg['message'])) . "</p><hr>";
-}
-
-// Affichage des erreurs
 if (!empty($_SESSION['errors'])) {
     foreach ($_SESSION['errors'] as $err) {
-        echo "<p style='color:red;'>".htmlspecialchars($err)."</p>";
+        echo "<p class='error'>" . htmlspecialchars($err) . "</p>";
     }
     unset($_SESSION['errors']);
+}
+
+$req = $dbh->query("SELECT * FROM message ORDER BY id DESC");
+foreach ($req as $msg) {
+    $date = new DateTime($msg['envoyé à']);
+    $formattedDate = $date->format('d/m/Y à H:i');
+
+    echo "<div class='message'>";
+    echo "<p class='author'>" . htmlspecialchars($msg['name']) . "</p>";
+    echo "<p class='timestamp'>Envoyé le " . $formattedDate . "</p>";
+    echo "<p>" . nl2br(htmlspecialchars($msg['message'])) . "</p>";
+    echo "</div><hr>";
 }
 ?>
 
@@ -51,6 +67,7 @@ if (!empty($_SESSION['errors'])) {
     <button type="submit">Envoyer</button>
 </form>
 
-<a href="logout.php">Se déconnecter</a>
+<p><a href="logout.php">Se déconnecter</a></p>
+
 </body>
 </html>

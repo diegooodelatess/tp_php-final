@@ -4,6 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Connexion / Inscription</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        form { margin-bottom: 30px; }
+        input, button { margin: 5px 0; padding: 8px; width: 250px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
 </head>
 <body>
 
@@ -23,17 +31,15 @@
 </form>
 
 <?php
-// Affichage des erreurs
 if (!empty($_SESSION['errors'])) {
     foreach ($_SESSION['errors'] as $err) {
-        echo "<p style='color:red;'>".htmlspecialchars($err)."</p>";
+        echo "<p class='error'>" . htmlspecialchars($err) . "</p>";
     }
     unset($_SESSION['errors']);
 }
 
-// Affichage des succès
 if (!empty($_SESSION['success'])) {
-    echo "<p style='color:green;'>".htmlspecialchars($_SESSION['success'])."</p>";
+    echo "<p class='success'>" . htmlspecialchars($_SESSION['success']) . "</p>";
     unset($_SESSION['success']);
 }
 ?>
