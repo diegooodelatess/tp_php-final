@@ -2,6 +2,7 @@
 session_start();
 require "sql.php";
 
+// Vérifie si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
     header("Location: formulaire.php");
     exit;
@@ -11,7 +12,7 @@ if (!isset($_SESSION['username'])) {
 if (isset($_POST['message']) && !empty(trim($_POST['message']))) {
     $message = trim($_POST['message']);
     if (strlen($message) <= 500) {
-        $stmt = $dbh->prepare("INSERT INTO message (content, author) VALUES (?, ?)");
+        $stmt = $dbh->prepare("INSERT INTO message (message, name) VALUES (?, ?)");
         $stmt->execute([$message, $_SESSION['username']]);
     } else {
         $_SESSION['errors'] = ["Le message est trop long (max 500 caractères)"];
@@ -29,12 +30,14 @@ if (isset($_POST['message']) && !empty(trim($_POST['message']))) {
 <h1>Messages</h1>
 
 <?php
-$req = $dbh->query("SELECT * FROM message ORDER BY id_message DESC");
+// Affichage des messages
+$req = $dbh->query("SELECT * FROM message ORDER BY id DESC");
 foreach ($req as $msg) {
-    echo "<p><strong>" . htmlspecialchars($msg['author']) . "</strong><br>";
-    echo nl2br(htmlspecialchars($msg['content'])) . "</p><hr>";
+    echo "<p><strong>" . htmlspecialchars($msg['name']) . "</strong><br>";
+    echo nl2br(htmlspecialchars($msg['message'])) . "</p><hr>";
 }
 
+// Affichage des erreurs
 if (!empty($_SESSION['errors'])) {
     foreach ($_SESSION['errors'] as $err) {
         echo "<p style='color:red;'>".htmlspecialchars($err)."</p>";

@@ -7,6 +7,7 @@ $errors = [];
 // Vérification des champs
 if (empty($_POST['username'])) $errors[] = "Nom d'utilisateur vide";
 if (empty($_POST['password'])) $errors[] = "Mot de passe vide";
+if (empty($_POST['name'])) $errors[] = "Nom complet vide";
 
 // Vérifier si username existe
 if (empty($errors)) {
@@ -36,10 +37,11 @@ if (strlen($_POST['password']) < 8) {
 $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
 // Insertion dans la table id_user
-$stmt = $dbh->prepare("INSERT INTO id_user (user_name, password) VALUES (?, ?)");
+$stmt = $dbh->prepare("INSERT INTO id_user (user_name, password, name) VALUES (?, ?, ?)");
 $stmt->execute([
     $_POST['username'],
-    $hash
+    $hash,
+    $_POST['name']
 ]);
 
 $_SESSION['success'] = "Inscription réussie ! Maintenant connecte-toi.";

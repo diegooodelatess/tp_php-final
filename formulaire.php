@@ -18,6 +18,7 @@
 <form method="post" action="registre_erreurs.php">
     <input type="text" name="username" placeholder="Nom d'utilisateur" required><br>
     <input type="password" name="password" placeholder="Mot de passe" required><br>
+    <input type="text" name="name" placeholder="Nom complet" required><br>
     <button type="submit">S'inscrire</button>
 </form>
 
